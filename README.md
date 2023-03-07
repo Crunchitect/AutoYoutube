@@ -2,6 +2,9 @@
 
 An automatic [YouTube](https://youtube.com) video maker. (still in dev)
 
+### Dependencies
+`pyChatGPT` and `gTTS`
+
 ### How to use
 1. Install and unzip the installed folder.
 2. Get OpenAI credentials by going to [OpenAI's ChatGPT](https://chat.openai.com/chat) and go to dev tools by clicking `F12`.
