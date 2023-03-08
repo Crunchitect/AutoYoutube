@@ -1,9 +1,8 @@
 from gtts import gTTS
-from transformers import pipeline, set_seed
+from transformers import pipeline
 from os import mkdir
 
 generator = pipeline('text-generation', model='gpt2-large')
-set_seed(42)
 get_script = generator('Hello Everyone, And welcome to another coding tutorial! Today we will talk about',
                        max_length=150)
 
