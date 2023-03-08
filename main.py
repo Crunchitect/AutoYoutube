@@ -1,18 +1,16 @@
-from pyChatGPT import ChatGPT
-from creds import session_token
 from gtts import gTTS
+from os import mkdir
 
-api = ChatGPT(session_token)
 
-# resp = api.send_message(f'Can you give me a YouTube video script for a 1'
-#                         f'-minute coding video with code snippets included?')
-resp = api.send_message(f'Hello')
-get_script = resp['message']
-print(resp['message'])
+get_script = "\"wow\"so hello\"but\"nevermind"
 
+try:
+    mkdir('resources')
+except FileExistsError:
+    pass
 
 gtts_filter = str(get_script)
-gtts_filter = gtts_filter.replace("```", "♦")
+gtts_filter = gtts_filter.replace("\"", "♦")
 gtts_speech = ''
 remove_from_gtts = False
 for i in gtts_filter:
