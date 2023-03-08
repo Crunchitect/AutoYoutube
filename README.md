@@ -3,7 +3,10 @@ An automatic [YouTube](https://youtube.com) video maker. (still in dev)
 
 ---
 ### Dependencies
-[`pytorch`](https://pytorch.org), [`transformers`](https://huggingface.co/docs/transformers/index) and [`gTTS`](https://pypi.org/project/gTTS/)
+- [`pytorch`](https://pytorch.org)
+- [`transformers`](https://huggingface.co/docs/transformers/index)
+- [`speechbrain`](https://speechbrain.github.io/)
+- [`gTTS`](https://pypi.org/project/gTTS/)
 
 ---
 ### How to use
