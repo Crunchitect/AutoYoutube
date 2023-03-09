@@ -1,11 +1,9 @@
 # AutoYoutube
-An automatic [YouTube](https://youtube.com) video maker. (still in dev)
+An automatic puzzle [YouTube](https://youtube.com) channel video maker. (still in dev)
 
 ---
 ### Dependencies
-- [`pytorch`](https://pytorch.org)
-- [`transformers`](https://huggingface.co/docs/transformers/index)
-- [`gTTS`](https://pypi.org/project/gTTS/)
+- [`PIL`](https://pillow.readthedocs.io/en/stable/)
 
 ---
 ### How to use
