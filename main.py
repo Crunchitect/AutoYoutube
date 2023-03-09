@@ -5,6 +5,49 @@ from glob import glob
 
 
 def main():
+
+    class ImPen:
+        class Constants:
+            r, g, b = 0, 0, 0
+            color = r, g, b
+            stroke = 3
+
+        @staticmethod
+        def impen_plot(im, x, y):
+            rad = ImPen.Constants.stroke
+            for dy in range(-rad, rad):
+                for dx in range(-rad, rad):
+                    if (dx ** 2 + dy ** 2) <= rad ** 2:
+                        try:
+                            im.putpixel((int(x + dx), int(y + dy)), ImPen.Constants.color)
+                        except IndexError:
+                            pass
+
+        @staticmethod
+        def impen_line(im, x1, y1, x2, y2):
+            dx = x2 - x1
+            dy = y2 - y1
+            for x in range(x1, x2+1):
+                y = y1 + dy * (x - x1) / dx
+                ImPen.impen_plot(im, int(x), int(y))
+
+        @staticmethod
+        def set_r(val): ImPen.Constants.r = val
+        @staticmethod
+        def set_g(val): ImPen.Constants.g = val
+        @staticmethod
+        def set_b(val): ImPen.Constants.b = val
+
+        @staticmethod
+        def set_col(val, g, b):
+            if isinstance(val, tuple):
+                ImPen.Constants.color = val
+            else:
+                ImPen.Constants.color = (val, g, b)
+
+        @staticmethod
+        def set_stroke(val): ImPen.Constants.stroke = val
+
     def create_files():
         try:
             mkdir('resources')
@@ -44,8 +87,8 @@ def main():
 
     def generate_frame(no):
         # import image
-        sudoku_frame = Image.new("RGB", (1080, 1920))
-        pixels = sudoku_frame.load()
+        sudoku_frame = Image.new("RGB", (1080, 1920), color=(255, 255, 255))
+        ImPen.impen_line(sudoku_frame, 0, 0, 1080, 1920)
         return sudoku_frame
 
     create_files()
