@@ -4,6 +4,7 @@ An automatic puzzle [YouTube](https://youtube.com) channel video maker. (still i
 ---
 ### Dependencies
 - [`PIL`](https://pillow.readthedocs.io/en/stable/)
+- [`OpenCV`](https://opencv.org/)
 
 ### How to use
 1. Install and unzip the installed folder.
