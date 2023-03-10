@@ -152,16 +152,6 @@ def main(*, verbose=False):
             pass
 
         try:
-            rmdir('resources/video')
-        except FileNotFoundError:
-            pass
-        except OSError:
-            files = glob(__file__[::-1][__file__[::-1].index('\\') + 1:][::-1] + '\\resources\\video\\*')
-            for f in files:
-                remove(f)
-            rmdir("resources/video")
-
-        try:
             mkdir('resources/video')
         except FileExistsError:
             pass
@@ -219,25 +209,27 @@ def main(*, verbose=False):
         for k in range(len(img_array)):
             out.write(img_array[k])
         out.release()
-
-    print("\u001b[36m ⓘ Creating Files" if verbose else "")
-    create_files()
-    print("\u001b[36m ⓘ Generating Sudoku" if verbose else "")
-    print("\u001b[36m ⓘ Creating Frames" if verbose else "")
-    grid = generate_sudoku()
-    store_grid = SudokuSolver.sudoku(grid)
-    for r, i in enumerate(store_grid):
-        print(f"\t\u001b[36m ⓘ Creating Frame: #{r+1}/{len(store_grid)+1}" if verbose else "")
-        if r == 0:
-            frame = generate_frame(store_grid[r], store_grid[r])
-        else:
-            frame = generate_frame(store_grid[r], store_grid[r - 1])
-        frame.save(f"resources/frames/{r+1:04}.png")
-    print(f"\t\u001b[36m ⓘ Creating Frame: #{len(store_grid) + 1}/{len(store_grid) + 1}" if verbose else "")
-    frame = generate_frame(store_grid[len(store_grid)-1], store_grid[len(store_grid)-1])
-    for i in range(2):
-        frame.save(f"resources/frames/{len(store_grid)+1+i:04}.png")
-    generate_video()
+    no_videos = int(input("How Many Videos would you like?: "))
+    for m in range(no_videos):
+        print(f"\u001b[33;1m ⓘ Creating Video #{m+1}/{no_videos} \u001b[0;0m" if verbose else "")
+        print("\u001b[36m ⓘ Creating Files" if verbose else "")
+        create_files()
+        print("\u001b[36m ⓘ Generating Sudoku" if verbose else "")
+        print("\u001b[36m ⓘ Creating Frames" if verbose else "")
+        grid = generate_sudoku()
+        store_grid = SudokuSolver.sudoku(grid)
+        for r, i in enumerate(store_grid):
+            print(f"\t\u001b[36m ⓘ Creating Frame: #{r+1}/{len(store_grid)+1}" if verbose else "")
+            if r == 0:
+                frame = generate_frame(store_grid[r], store_grid[r])
+            else:
+                frame = generate_frame(store_grid[r], store_grid[r - 1])
+            frame.save(f"resources/frames/{r+1:04}.png")
+        print(f"\t\u001b[36m ⓘ Creating Frame: #{len(store_grid) + 1}/{len(store_grid) + 1}" if verbose else "")
+        frame = generate_frame(store_grid[len(store_grid)-1], store_grid[len(store_grid)-1])
+        for i in range(2):
+            frame.save(f"resources/frames/{len(store_grid)+1+i:04}.png")
+        generate_video()
 
 
 if __name__ == '__main__':
