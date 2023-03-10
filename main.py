@@ -32,10 +32,10 @@ def main():
             dx = x2 - x1
             dy = y2 - y1
             for x in range(x1, x2+1):
-                y = y1 + dy * (x - x1) / dx if dx != 0 else 0
+                y = y1 + dy * (x - x1) / dx if dx != 0 else -1
                 ImPen.impen_plot(im, int(x), int(y))
             for y in range(y1, y2+1):
-                x = x1 + dx * (y - y1) / dy if dy != 0 else 0
+                x = x1 + dx * (y - y1) / dy if dy != 0 else -1
                 ImPen.impen_plot(im, int(x), int(y))
 
         @staticmethod
@@ -44,6 +44,16 @@ def main():
             ImPen.impen_line(im, x1, y2, x2, y2)
             ImPen.impen_line(im, x1, y1, x1, y2)
             ImPen.impen_line(im, x2, y1, x2, y2)
+
+        @staticmethod
+        def impen_grid(im, tl, tr, sz_tl, sz_tr):
+            w, h = im.size
+            for i in range(tl):
+                for j in range(tr):
+                    ImPen.impen_rect(im, int(w // 2 + (i - tl // 2 - 0.5) * sz_tl),
+                                     int(h // 2 + (j - tr // 2 - 0.5) * sz_tr),
+                                     int(w // 2 + (i - tl // 2 - 0.5) * sz_tl + sz_tl),
+                                     int(h // 2 + (j - tr // 2 - 0.5) * sz_tr + sz_tr))
 
         @staticmethod
         def set_r(val): ImPen.Constants.r = val
@@ -101,10 +111,13 @@ def main():
 
     def generate_frame(no):
         # import image
-        sudoku_frame = Image.new("RGB", (1080, 1920), color=(255, 255, 255))
+        w = 1080
+        h = 1920
+        sudoku_frame = Image.new("RGB", (w, h), color=(255, 255, 255))
         ImPen.set_stroke(5)
-        ImPen.impen_line(sudoku_frame, 70, 200, 70, 400)
-        ImPen.impen_rect(sudoku_frame, 100, 100, 50, 50)
+        # ImPen.impen_rect(sudoku_frame, 100, 100, 50, 50)
+        # ImPen.impen_rect(sudoku_frame, 100, 100, 200, 200)
+        ImPen.impen_grid(sudoku_frame, 9, 9, 100, 100)
         return sudoku_frame
 
     create_files()
