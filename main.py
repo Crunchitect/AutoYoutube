@@ -1,4 +1,4 @@
-from os import mkdir, remove
+from os import mkdir, rmdir, remove
 from random import sample
 from PIL import Image, ImageFont, ImageDraw
 from glob import glob
@@ -128,10 +128,16 @@ def main(*, verbose=False):
             pass
 
         try:
-            mkdir('resources/frames')
-            files = glob('resources/frames/*')
+            rmdir('resources/frames')
+        except FileNotFoundError:
+            pass
+        except OSError:
+            files = glob('/resources/frames/.*')
             for f in files:
                 remove(f)
+
+        try:
+            mkdir('resources/frames')
         except FileExistsError:
             pass
 
@@ -154,13 +160,13 @@ def main(*, verbose=False):
         board = [[nums[pattern(r, c)] for c in cols] for r in rows]
 
         squares = side * side
-        empties = squares * 3 // 4
+        empties = squares * 1 // 2
         for p in sample(range(squares), empties):
             board[p // side][p % side] = 0
 
         return board
 
-    def generate_frame(b):
+    def generate_frame(b, b_prime):
         # import image
         w = 1080
         h = 1920
@@ -170,6 +176,14 @@ def main(*, verbose=False):
         ImPen.impen_text(sudoku_frame, 0, 0, "Easy Sudoku")
         for x in range(0, 9):
             for y in range(0, 9):
+                if b[y][x] == b_prime[y][x]:
+                    ImPen.set_r(0)
+                    ImPen.set_g(0)
+                    ImPen.set_b(0)
+                else:
+                    ImPen.set_r(0)
+                    ImPen.set_g(255)
+                    ImPen.set_b(255)
                 ImPen.impen_text_grid(sudoku_frame, 9, 9, 100, 100, x, y, b[y][x] if b[y][x] != 0 else " ")
         return sudoku_frame
 
@@ -180,9 +194,9 @@ def main(*, verbose=False):
     frame_no = 1
     grid = generate_sudoku()
     prev_grid = generate_sudoku()
-    while any(0 in sublist for sublist in grid):
-        generate_frame(grid).save(f"resources/frames/{frame_no}.png")
+    while any(0 in sublist for sublist in grid) and frame_no < 50:
         iy, ix = SudokuSolver.solve(grid)
+        generate_frame(grid,  prev_grid).save(f"resources/frames/{frame_no}.png")
         if prev_grid == grid:
             grid[iy][ix] = 0
         print(f"\t\u001b[36m ⓘ Creating Frame #{frame_no}" if verbose else "")
