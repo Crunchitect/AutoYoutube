@@ -3,6 +3,7 @@ from random import sample
 from PIL import Image, ImageFont, ImageDraw
 from glob import glob
 from time import perf_counter
+from copy import deepcopy
 
 
 def main(*, verbose=False):
@@ -28,18 +29,20 @@ def main(*, verbose=False):
 
         @staticmethod
         def impen_line(im, x1, y1, x2, y2):
-            if x1 > x2:
-                x2, x1 = x1, x2
-            if y1 > y2:
-                y2, y1 = y1, y2
-            dx = x2 - x1
-            dy = y2 - y1
-            for x in range(x1, x2+1):
-                y = y1 + dy * (x - x1) / dx if dx != 0 else -1
-                ImPen.impen_plot(im, int(x), int(y))
-            for y in range(y1, y2+1):
-                x = x1 + dx * (y - y1) / dy if dy != 0 else -1
-                ImPen.impen_plot(im, int(x), int(y))
+            # if x1 > x2:
+            #     x2, x1 = x1, x2
+            # if y1 > y2:
+            #     y2, y1 = y1, y2
+            # dx = x2 - x1
+            # dy = y2 - y1
+            # for x in range(x1, x2+1):
+            #     y = y1 + dy * (x - x1) / dx if dx != 0 else -1
+            #     ImPen.impen_plot(im, int(x), int(y))
+            # for y in range(y1, y2+1):
+            #     x = x1 + dx * (y - y1) / dy if dy != 0 else -1
+            #     ImPen.impen_plot(im, int(x), int(y))
+            canvas = ImageDraw.Draw(im)
+            canvas.line(((x1, y1), (x2, y2)), ImPen.Constants.color, ImPen.Constants.stroke)
 
         @staticmethod
         def impen_rect(im, x1, y1, x2, y2):
@@ -51,11 +54,11 @@ def main(*, verbose=False):
         @staticmethod
         def impen_grid(im, tl, tr, sz_tl, sz_tr):
             w, h = im.size
-            for i in range(tl):
+            for k in range(tl):
                 for j in range(tr):
-                    ImPen.impen_rect(im, int(w // 2 + (i - tl // 2 - 0.5) * sz_tl),
+                    ImPen.impen_rect(im, int(w // 2 + (k - tl // 2 - 0.5) * sz_tl),
                                      int(h // 2 + (j - tr // 2 - 0.5) * sz_tr),
-                                     int(w // 2 + (i - tl // 2 - 0.5) * sz_tl + sz_tl),
+                                     int(w // 2 + (k - tl // 2 - 0.5) * sz_tl + sz_tl),
                                      int(h // 2 + (j - tr // 2 - 0.5) * sz_tr + sz_tr))
 
         @staticmethod
@@ -107,9 +110,9 @@ def main(*, verbose=False):
 
                 start_row = row - row % 3
                 start_col = col - col % 3
-                for i in range(3):
+                for k in range(3):
                     for j in range(3):
-                        if g[i + start_row][j + start_col] == num:
+                        if g[k + start_row][j + start_col] == num:
                             return False
                 return True
 
@@ -126,14 +129,13 @@ def main(*, verbose=False):
                     if solve(g, row, col, num):
 
                         g[row][col] = num
-                        grid_history.append(g)
+                        grid_history.append(deepcopy(g))
                         if sudoku_solve(g, row, col + 1, grid_history):
                             return True
                     g[row][col] = 0
-                    grid_history.append(g)
                 return False
 
-            board_prime = [board]
+            board_prime = [deepcopy(board)]
             if sudoku_solve(board, 0, 0, board_prime):
                 return board_prime
             else:
@@ -152,7 +154,6 @@ def main(*, verbose=False):
         except OSError:
             files = glob(__file__[::-1][__file__[::-1].index('\\')+1:][::-1] + '\\resources\\frames\\*')
             for f in files:
-                print(f)
                 remove(f)
             rmdir("resources/frames")
 
@@ -167,17 +168,17 @@ def main(*, verbose=False):
         side = base * base
 
         # pattern for a baseline valid solution
-        def pattern(r, c): return (base * (r % base) + r // base + c) % side
+        def pattern(rx, c): return (base * (rx % base) + rx // base + c) % side
 
         def shuffle(s): return sample(s, len(s))
 
         r_base = range(base)
-        rows = [g * base + r for g in shuffle(r_base) for r in shuffle(r_base)]
+        rows = [g * base + rx for g in shuffle(r_base) for rx in shuffle(r_base)]
         cols = [g * base + c for g in shuffle(r_base) for c in shuffle(r_base)]
         nums = shuffle(range(1, base * base + 1))
 
         # produce board using randomized baseline pattern
-        board = [[nums[pattern(r, c)] for c in cols] for r in rows]
+        board = [[nums[pattern(rx, c)] for c in cols] for rx in rows]
 
         squares = side * side
         empties = squares * 1 // 4
@@ -191,15 +192,15 @@ def main(*, verbose=False):
         w = 1080
         h = 1920
         sudoku_frame = Image.new("RGB", (w, h), color=(255, 255, 255))
-        ImPen.set_stroke(5)
-        # ImPen.impen_grid(sudoku_frame, 9, 9, 100, 100)
+        ImPen.set_stroke(10)
+        ImPen.impen_grid(sudoku_frame, 9, 9, 100, 100)
         ImPen.impen_text(sudoku_frame, 0, 0, "Easy Sudoku")
         for x in range(0, 9):
             for y in range(0, 9):
+                ImPen.set_col(0, 0, 0)
                 if b[y][x] == b_prime[y][x]:
                     ImPen.set_col(0, 0, 0)
                 else:
-                    print(b[y][x])
                     ImPen.set_col(0, 255, 255)
                 ImPen.impen_text_grid(sudoku_frame, 9, 9, 100, 100, x, y, b[y][x] if b[y][x] != 0 else " ")
         return sudoku_frame
@@ -208,13 +209,18 @@ def main(*, verbose=False):
     create_files()
     print("\u001b[36m ⓘ Generating Sudoku" if verbose else "")
     print("\u001b[36m ⓘ Creating Frames" if verbose else "")
-    frame_no = 1
     grid = generate_sudoku()
-    store_grid = []
-    # SudokuSolver.solve(grid, store_grid)
-    generate_frame(store_grid[len(store_grid)-1], store_grid[len(store_grid)-1])
-    print(len(store_grid))
-    print(store_grid[len(store_grid)-1])
+    store_grid = SudokuSolver.sudoku(grid)
+    for r, i in enumerate(store_grid):
+        print(f"\t\u001b[36m ⓘ Creating Frame: #{r+1}/{len(store_grid)+1}" if verbose else "")
+        if r == 0:
+            frame = generate_frame(store_grid[r], store_grid[r])
+        else:
+            frame = generate_frame(store_grid[r], store_grid[r - 1])
+        frame.save(f"resources/frames/{r+1}.png")
+    print(f"\t\u001b[36m ⓘ Creating Frame: #{len(store_grid) + 1}/{len(store_grid) + 1}" if verbose else "")
+    frame = generate_frame(store_grid[len(store_grid)-1], store_grid[len(store_grid)-1])
+    frame.save(f"resources/frames/{len(store_grid)+1}.png")
 
 
 if __name__ == '__main__':
