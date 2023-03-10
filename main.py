@@ -1,4 +1,4 @@
-from os import mkdir, rmdir, remove, chdir, listdir, path
+from os import mkdir, rmdir, remove
 from random import sample
 from PIL import Image, ImageFont, ImageDraw
 from glob import glob
@@ -182,7 +182,7 @@ def main(*, verbose=False):
         board = [[nums[pattern(rx, c)] for c in cols] for rx in rows]
 
         squares = side * side
-        empties = squares * 1 // 4
+        empties = squares * 9 // 16
         for p in sample(range(squares), empties):
             board[p // side][p % side] = 0
 
@@ -232,10 +232,11 @@ def main(*, verbose=False):
             frame = generate_frame(store_grid[r], store_grid[r])
         else:
             frame = generate_frame(store_grid[r], store_grid[r - 1])
-        frame.save(f"resources/frames/{r+1}.png")
+        frame.save(f"resources/frames/{r+1:04}.png")
     print(f"\t\u001b[36m ⓘ Creating Frame: #{len(store_grid) + 1}/{len(store_grid) + 1}" if verbose else "")
     frame = generate_frame(store_grid[len(store_grid)-1], store_grid[len(store_grid)-1])
-    frame.save(f"resources/frames/{len(store_grid)+1}.png")
+    for i in range(2):
+        frame.save(f"resources/frames/{len(store_grid)+1+i:04}.png")
     generate_video()
 
 
