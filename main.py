@@ -95,31 +95,49 @@ def main(*, verbose=False):
 
     class SudokuSolver:
         @staticmethod
-        def is_possible(grid, y, x, n):
-            for i in range(0, 9):
-                if grid[y][i] == n:
-                    return False
-            for i in range(0, 9):
-                if grid[i][x] == n:
-                    return False
-            x0 = (x//3)*3
-            y0 = (y//3)*3
-            for i in range(0, 3):
-                for j in range(0, 3):
-                    if grid[y0+i][x0+j] == n:
-                        return False
-            return True
-
-        @staticmethod
-        def solve(g):
-            for y in range(9):
+        def sudoku(board):
+            def solve(g, row, col, num):
                 for x in range(9):
-                    if g[y][x] == 0:
-                        for n in range(1, 10):
-                            if SudokuSolver.is_possible(g, y, x, n):
-                                g[y][x] = n
-                                return y, x
-                        return 0 / 0
+                    if g[row][x] == num:
+                        return False
+
+                for x in range(9):
+                    if g[x][col] == num:
+                        return False
+
+                start_row = row - row % 3
+                start_col = col - col % 3
+                for i in range(3):
+                    for j in range(3):
+                        if g[i + start_row][j + start_col] == num:
+                            return False
+                return True
+
+            def sudoku_solve(g, row, col, grid_history):
+                if row == 9 - 1 and col == 9:
+                    return True
+                if col == 9:
+                    row += 1
+                    col = 0
+                if g[row][col] > 0:
+                    return sudoku_solve(g, row, col + 1, grid_history)
+                for num in range(1, 9 + 1, 1):
+
+                    if solve(g, row, col, num):
+
+                        g[row][col] = num
+                        grid_history.append(g)
+                        if sudoku_solve(g, row, col + 1, grid_history):
+                            return True
+                    g[row][col] = 0
+                    grid_history.append(g)
+                return False
+
+            board_prime = [board]
+            if sudoku_solve(board, 0, 0, board_prime):
+                return board_prime
+            else:
+                assert False, "Solution does not exist :("
 
     def create_files():
         try:
@@ -132,9 +150,11 @@ def main(*, verbose=False):
         except FileNotFoundError:
             pass
         except OSError:
-            files = glob('/resources/frames/.*')
+            files = glob(__file__[::-1][__file__[::-1].index('\\')+1:][::-1] + '\\resources\\frames\\*')
             for f in files:
+                print(f)
                 remove(f)
+            rmdir("resources/frames")
 
         try:
             mkdir('resources/frames')
@@ -160,7 +180,7 @@ def main(*, verbose=False):
         board = [[nums[pattern(r, c)] for c in cols] for r in rows]
 
         squares = side * side
-        empties = squares * 1 // 2
+        empties = squares * 1 // 4
         for p in sample(range(squares), empties):
             board[p // side][p % side] = 0
 
@@ -177,13 +197,10 @@ def main(*, verbose=False):
         for x in range(0, 9):
             for y in range(0, 9):
                 if b[y][x] == b_prime[y][x]:
-                    ImPen.set_r(0)
-                    ImPen.set_g(0)
-                    ImPen.set_b(0)
+                    ImPen.set_col(0, 0, 0)
                 else:
-                    ImPen.set_r(0)
-                    ImPen.set_g(255)
-                    ImPen.set_b(255)
+                    print(b[y][x])
+                    ImPen.set_col(0, 255, 255)
                 ImPen.impen_text_grid(sudoku_frame, 9, 9, 100, 100, x, y, b[y][x] if b[y][x] != 0 else " ")
         return sudoku_frame
 
@@ -193,15 +210,11 @@ def main(*, verbose=False):
     print("\u001b[36m ⓘ Creating Frames" if verbose else "")
     frame_no = 1
     grid = generate_sudoku()
-    prev_grid = generate_sudoku()
-    while any(0 in sublist for sublist in grid) and frame_no < 50:
-        iy, ix = SudokuSolver.solve(grid)
-        generate_frame(grid,  prev_grid).save(f"resources/frames/{frame_no}.png")
-        if prev_grid == grid:
-            grid[iy][ix] = 0
-        print(f"\t\u001b[36m ⓘ Creating Frame #{frame_no}" if verbose else "")
-        frame_no += 1
-        prev_grid = grid
+    store_grid = []
+    # SudokuSolver.solve(grid, store_grid)
+    generate_frame(store_grid[len(store_grid)-1], store_grid[len(store_grid)-1])
+    print(len(store_grid))
+    print(store_grid[len(store_grid)-1])
 
 
 if __name__ == '__main__':
