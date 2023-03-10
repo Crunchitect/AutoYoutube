@@ -1,6 +1,6 @@
 from os import mkdir, remove
 from random import sample
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw
 from glob import glob
 from time import perf_counter
 
@@ -59,6 +59,21 @@ def main(*, verbose=False):
                                      int(h // 2 + (j - tr // 2 - 0.5) * sz_tr + sz_tr))
 
         @staticmethod
+        def impen_text(im, x, y, text):
+            font = ImageFont.truetype("assets/font.ttf", 60)
+            canvas = ImageDraw.Draw(im)
+
+            canvas.text((x, y), text, font=font, fill=ImPen.Constants.color)
+
+        @staticmethod
+        def impen_text_grid(im, tl, tr, sz_tl, sz_tr, tx, ty, text):
+            text = str(text)
+            w, h = im.size
+            ImPen.impen_text(im,
+                             int(w // 2 + (tx - tl // 2 - 0.25) * sz_tl),
+                             int(h // 2 + (ty - tr // 2 - 0.5) * sz_tr), text)
+
+        @staticmethod
         def set_r(val): ImPen.Constants.r = val
         @staticmethod
         def set_g(val): ImPen.Constants.g = val
@@ -115,23 +130,26 @@ def main(*, verbose=False):
         for p in sample(range(squares), empties):
             board[p // side][p % side] = 0
 
-    def generate_frame(no):
+        return board
+
+    def generate_frame(board):
         # import image
         w = 1080
         h = 1920
         sudoku_frame = Image.new("RGB", (w, h), color=(255, 255, 255))
         ImPen.set_stroke(5)
-        # ImPen.impen_rect(sudoku_frame, 100, 100, 50, 50)
-        # ImPen.impen_rect(sudoku_frame, 100, 100, 200, 200)
         ImPen.impen_grid(sudoku_frame, 9, 9, 100, 100)
+        ImPen.impen_text(sudoku_frame, 0, 0, "Easy Sudoku")
+        for x in range(0, 9):
+            for y in range(0, 9):
+                ImPen.impen_text_grid(sudoku_frame, 9, 9, 100, 100, x, y, board[y][x] if board[y][x] != 0 else " ")
         return sudoku_frame
 
     print("\u001b[36m ⓘ Creating Files" if verbose else "")
     create_files()
     print("\u001b[36m ⓘ Generating Sudoku" if verbose else "")
-    generate_sudoku()
     print("\u001b[36m ⓘ Creating Frames" if verbose else "")
-    generate_frame(1).save("resources/frames/1.png")
+    generate_frame(generate_sudoku()).save("resources/frames/1.png")
 
 
 if __name__ == '__main__':
