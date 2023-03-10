@@ -2,9 +2,12 @@ from os import mkdir, remove
 from random import sample
 from PIL import Image
 from glob import glob
+from time import perf_counter
 
 
-def main():
+def main(*, verbose=False):
+    if verbose:
+        print("\u001b[36m ⓘ Starting ImPen")
 
     class ImPen:
         class Constants:
@@ -72,6 +75,9 @@ def main():
         @staticmethod
         def set_stroke(val): ImPen.Constants.stroke = val
 
+    if verbose:
+        print("\u001b[36m ⓘ Defining Functions")
+
     def create_files():
         try:
             mkdir('resources')
@@ -120,10 +126,15 @@ def main():
         ImPen.impen_grid(sudoku_frame, 9, 9, 100, 100)
         return sudoku_frame
 
+    print("\u001b[36m ⓘ Creating Files" if verbose else "")
     create_files()
+    print("\u001b[36m ⓘ Generating Sudoku" if verbose else "")
     generate_sudoku()
+    print("\u001b[36m ⓘ Creating Frames" if verbose else "")
     generate_frame(1).save("resources/frames/1.png")
 
 
 if __name__ == '__main__':
-    main()
+    start = perf_counter()
+    main(verbose=True)
+    print(f"\u001b[32;1m ✅ Done In: \u001b[38;5;166m{perf_counter() - start}\u001b[32;1ms  \u001b[0m")
