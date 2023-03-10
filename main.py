@@ -1,9 +1,10 @@
-from os import mkdir, rmdir, remove
+from os import mkdir, rmdir, remove, chdir, listdir, path
 from random import sample
 from PIL import Image, ImageFont, ImageDraw
 from glob import glob
 from time import perf_counter
 from copy import deepcopy
+import cv2
 
 
 def main(*, verbose=False):
@@ -150,6 +151,21 @@ def main(*, verbose=False):
         except FileExistsError:
             pass
 
+        try:
+            rmdir('resources/video')
+        except FileNotFoundError:
+            pass
+        except OSError:
+            files = glob(__file__[::-1][__file__[::-1].index('\\') + 1:][::-1] + '\\resources\\video\\*')
+            for f in files:
+                remove(f)
+            rmdir("resources/video")
+
+        try:
+            mkdir('resources/video')
+        except FileExistsError:
+            pass
+
     def generate_sudoku():
         base = 3
         side = base * base
@@ -184,10 +200,25 @@ def main(*, verbose=False):
                 ImPen.set_col(0, 0, 0)
                 if b[y][x] == b_prime[y][x]:
                     ImPen.set_col(0, 0, 0)
-                else:
+                    ImPen.impen_text_grid(sudoku_frame, 9, 9, 100, 100, x, y, b[y][x] if b[y][x] != 0 else " ")
+                elif b[y][x] > b_prime[y][x]:
                     ImPen.set_col(0, 255, 255)
-                ImPen.impen_text_grid(sudoku_frame, 9, 9, 100, 100, x, y, b[y][x] if b[y][x] != 0 else " ")
+                    ImPen.impen_text_grid(sudoku_frame, 9, 9, 100, 100, x, y, b[y][x] if b[y][x] != 0 else " ")
         return sudoku_frame
+
+    def generate_video():
+        img_array = []
+        size = ()
+        for filename in glob(__file__[::-1][__file__[::-1].index('\\')+1:][::-1] + '\\resources\\frames\\*.png'):
+            img = cv2.imread(filename)
+            height, width, layers = img.shape
+            size = (width, height)
+            img_array.append(img)
+        out = cv2.VideoWriter('resources/video/output.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 4, size)
+
+        for k in range(len(img_array)):
+            out.write(img_array[k])
+        out.release()
 
     print("\u001b[36m ⓘ Creating Files" if verbose else "")
     create_files()
@@ -205,6 +236,7 @@ def main(*, verbose=False):
     print(f"\t\u001b[36m ⓘ Creating Frame: #{len(store_grid) + 1}/{len(store_grid) + 1}" if verbose else "")
     frame = generate_frame(store_grid[len(store_grid)-1], store_grid[len(store_grid)-1])
     frame.save(f"resources/frames/{len(store_grid)+1}.png")
+    generate_video()
 
 
 if __name__ == '__main__':
