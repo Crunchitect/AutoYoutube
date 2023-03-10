@@ -29,18 +29,6 @@ def main(*, verbose=False):
 
         @staticmethod
         def impen_line(im, x1, y1, x2, y2):
-            # if x1 > x2:
-            #     x2, x1 = x1, x2
-            # if y1 > y2:
-            #     y2, y1 = y1, y2
-            # dx = x2 - x1
-            # dy = y2 - y1
-            # for x in range(x1, x2+1):
-            #     y = y1 + dy * (x - x1) / dx if dx != 0 else -1
-            #     ImPen.impen_plot(im, int(x), int(y))
-            # for y in range(y1, y2+1):
-            #     x = x1 + dx * (y - y1) / dy if dy != 0 else -1
-            #     ImPen.impen_plot(im, int(x), int(y))
             canvas = ImageDraw.Draw(im)
             canvas.line(((x1, y1), (x2, y2)), ImPen.Constants.color, ImPen.Constants.stroke)
 
@@ -163,11 +151,9 @@ def main(*, verbose=False):
             pass
 
     def generate_sudoku():
-        # Generate Sudoku
         base = 3
         side = base * base
 
-        # pattern for a baseline valid solution
         def pattern(rx, c): return (base * (rx % base) + rx // base + c) % side
 
         def shuffle(s): return sample(s, len(s))
@@ -177,7 +163,6 @@ def main(*, verbose=False):
         cols = [g * base + c for g in shuffle(r_base) for c in shuffle(r_base)]
         nums = shuffle(range(1, base * base + 1))
 
-        # produce board using randomized baseline pattern
         board = [[nums[pattern(rx, c)] for c in cols] for rx in rows]
 
         squares = side * side
@@ -188,7 +173,6 @@ def main(*, verbose=False):
         return board
 
     def generate_frame(b, b_prime):
-        # import image
         w = 1080
         h = 1920
         sudoku_frame = Image.new("RGB", (w, h), color=(255, 255, 255))
