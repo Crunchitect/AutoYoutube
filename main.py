@@ -178,13 +178,30 @@ def main(*, verbose=False):
 
         return board
 
-    def generate_frame(b, b_prime):
+    def generate_frame(b, b_prime, difficulty):
         w = 1080
         h = 1920
         sudoku_frame = Image.new("RGB", (w, h), color=(255, 255, 255))
         ImPen.set_stroke(10)
         ImPen.impen_grid(sudoku_frame, 9, 9, 100, 100)
-        ImPen.impen_text(sudoku_frame, 0, 0, "Easy Sudoku")
+        ImPen.set_col(0, 0, 0)
+        ImPen.impen_text(sudoku_frame, 0, 0, "Sudoku Difficulty: ")
+        if difficulty >= 400:
+            ImPen.set_col(128, 0, 0)
+            ImPen.impen_text(sudoku_frame, 700, 0, "Very Hard")
+        elif difficulty >= 300:
+            ImPen.set_col(255, 0, 0)
+            ImPen.impen_text(sudoku_frame, 700, 0, "Hard")
+        elif difficulty >= 200:
+            ImPen.set_col(255, 255, 0)
+            ImPen.impen_text(sudoku_frame, 700, 0, "Normal")
+        elif difficulty >= 100:
+            ImPen.set_col(128, 255, 0)
+            ImPen.impen_text(sudoku_frame, 700, 0, "Easy")
+        else:
+            ImPen.set_col(0, 255, 0)
+            ImPen.impen_text(sudoku_frame, 700, 0, "Very Easy")
+        ImPen.set_col(0, 0, 0)
         for x in range(0, 9):
             for y in range(0, 9):
                 ImPen.set_col(0, 0, 0)
@@ -196,7 +213,7 @@ def main(*, verbose=False):
                     ImPen.impen_text_grid(sudoku_frame, 9, 9, 100, 100, x, y, b[y][x] if b[y][x] != 0 else " ")
         return sudoku_frame
 
-    def generate_video(n):
+    def generate_video(n, fps):
         img_array = []
         size = ()
         for filename in glob(__file__[::-1][__file__[::-1].index('\\')+1:][::-1] + '\\resources\\frames\\*.png'):
@@ -204,11 +221,12 @@ def main(*, verbose=False):
             height, width, layers = img.shape
             size = (width, height)
             img_array.append(img)
-        out = cv2.VideoWriter(f'resources/video/vid_{n+1}.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 10, size)
+        out = cv2.VideoWriter(f'resources/video/vid_{n+1}.mp4', cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
 
         for k in range(len(img_array)):
             out.write(img_array[k])
         out.release()
+    fps = 30
     no_videos = int(input("How Many Videos would you like?: "))
     for m in range(no_videos):
         print(f"\u001b[33;1m ⓘ Creating Video #{m+1}/{no_videos} \u001b[0;0m" if verbose else "")
@@ -218,19 +236,31 @@ def main(*, verbose=False):
         print("\u001b[36m ⓘ Creating Frames" if verbose else "")
         grid = generate_sudoku()
         store_grid = SudokuSolver.sudoku(grid)
+        starter_frame = generate_frame(store_grid[0], store_grid[0], len(store_grid))
+        ImPen.impen_text(starter_frame, 250, 200, "Sudoku of the Hour!")
+        ImPen.impen_text(starter_frame, 250, 250, "Can you do it?")
+        for i in range(fps * 5):
+            seconds = i // fps
+            seconds_true = i / fps
+            ImPen.set_col(int(255 * seconds / 5), int(255 * (1 - seconds / 5)), 0)
+            ImPen.impen_text(starter_frame, 300, 300, f"{round(5-seconds_true, 3)}")
+            starter_frame.save(f"resources/frames/{i+1:04}.png")
+            ImPen.set_col(255, 255, 255)
+            ImPen.impen_text(starter_frame, 300, 300, f"{round(5-seconds_true, 3)}")
+
         for r, i in enumerate(store_grid):
-            print(f"\t\u001b[36m ⓘ Creating Frame: #{r+1}/{len(store_grid)+1}" if verbose else "")
+            print(f"\t\u001b[36m ⓘ Creating Frame: #{r+1}/{len(store_grid)+30}" if verbose else "")
             if r == 0:
-                frame = generate_frame(store_grid[r], store_grid[r])
+                frame = generate_frame(store_grid[r], store_grid[r], len(store_grid))
             else:
-                frame = generate_frame(store_grid[r], store_grid[r - 1])
-            frame.save(f"resources/frames/{r+1:04}.png")
+                frame = generate_frame(store_grid[r], store_grid[r - 1], len(store_grid))
+            frame.save(f"resources/frames/{r+1+fps*5:04}.png")
         print(f"\t\u001b[36m ⓘ Creating Frame: #{len(store_grid) + 1}/{len(store_grid) + 1}" if verbose else "")
-        frame = generate_frame(store_grid[len(store_grid)-1], store_grid[len(store_grid)-1])
-        for i in range(2):
-            frame.save(f"resources/frames/{len(store_grid)+1+i:04}.png")
+        frame = generate_frame(store_grid[len(store_grid)-1], store_grid[len(store_grid)-1], len(store_grid))
+        for i in range(int(fps * 1.5)):
+            frame.save(f"resources/frames/{len(store_grid)+1+i+fps*5:04}.png")
         print(f"\t\u001b[36m ⓘ Generating Video" if verbose else "")
-        generate_video(m)
+        generate_video(m, fps=fps)
 
 
 if __name__ == '__main__':
