@@ -264,7 +264,7 @@ def main(*, verbose=False):
             print(f"\t\u001b[36m ⓘ Generating Video" if verbose else "")
             generate_video(m, fps=fps)
             path = __file__[::-1][__file__[::-1].index('\\')+1:][::-1]
-            system(f'''python upload_video.py --file="{path}\\resources\\video\\vid_{m+1}.mp4" --title="Sudoku Puzzle No.{m+1} Can you solve it? #shorts" --description="Can you solve this sudoku?" --keywords="sudoku, puzzle" --category="22" --privacyStatus="private"''')
+            system(f'''python upload_video.py --file="{path}\\resources\\video\\vid_{m+1}.mp4" --title="Sudoku Puzzle No.{m+1} Can you solve it? #shorts" --description="Can you solve this sudoku?" --keywords="sudoku, puzzle" --category="22" --privacyStatus="public"''')
 
     main_call()
 
