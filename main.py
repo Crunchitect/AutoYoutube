@@ -1,4 +1,4 @@
-from os import mkdir, rmdir, remove
+from os import mkdir, rmdir, remove, system
 from random import sample
 from PIL import Image, ImageFont, ImageDraw
 from glob import glob
@@ -263,6 +263,8 @@ def main(*, verbose=False):
                 frame.save(f"resources/frames/{len(store_grid)+1+i+fps*5:04}.png")
             print(f"\t\u001b[36m ⓘ Generating Video" if verbose else "")
             generate_video(m, fps=fps)
+            path = __file__[::-1][__file__[::-1].index('\\')+1:][::-1]
+            system(f'''python upload_video.py --file="{path}\\resources\\video\\vid_{m+1}.mp4" --title="Sudoku Puzzle No.{m+1} Can you solve it? #shorts" --description="Can you solve this sudoku?" --keywords="sudoku, puzzle" --category="22" --privacyStatus="private"''')
 
     main_call()
 
