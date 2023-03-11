@@ -226,41 +226,45 @@ def main(*, verbose=False):
         for k in range(len(img_array)):
             out.write(img_array[k])
         out.release()
-    fps = 30
-    no_videos = int(input("How Many Videos would you like?: "))
-    for m in range(no_videos):
-        print(f"\u001b[33;1m ⓘ Creating Video #{m+1}/{no_videos} \u001b[0;0m" if verbose else "")
-        print("\u001b[36m ⓘ Creating Files" if verbose else "")
-        create_files()
-        print("\u001b[36m ⓘ Generating Sudoku" if verbose else "")
-        print("\u001b[36m ⓘ Creating Frames" if verbose else "")
-        grid = generate_sudoku()
-        store_grid = SudokuSolver.sudoku(grid)
-        starter_frame = generate_frame(store_grid[0], store_grid[0], len(store_grid))
-        ImPen.impen_text(starter_frame, 250, 200, "Sudoku of the Hour!")
-        ImPen.impen_text(starter_frame, 250, 250, "Can you do it?")
-        for i in range(fps * 5):
-            seconds = i // fps
-            seconds_true = i / fps
-            ImPen.set_col(int(255 * seconds / 5), int(255 * (1 - seconds / 5)), 0)
-            ImPen.impen_text(starter_frame, 300, 300, f"{round(5-seconds_true, 3)}")
-            starter_frame.save(f"resources/frames/{i+1:04}.png")
-            ImPen.set_col(255, 255, 255)
-            ImPen.impen_text(starter_frame, 300, 300, f"{round(5-seconds_true, 3)}")
 
-        for r, i in enumerate(store_grid):
-            print(f"\t\u001b[36m ⓘ Creating Frame: #{r+1}/{len(store_grid)+30}" if verbose else "")
-            if r == 0:
-                frame = generate_frame(store_grid[r], store_grid[r], len(store_grid))
-            else:
-                frame = generate_frame(store_grid[r], store_grid[r - 1], len(store_grid))
-            frame.save(f"resources/frames/{r+1+fps*5:04}.png")
-        print(f"\t\u001b[36m ⓘ Creating Frame: #{len(store_grid) + 1}/{len(store_grid) + 1}" if verbose else "")
-        frame = generate_frame(store_grid[len(store_grid)-1], store_grid[len(store_grid)-1], len(store_grid))
-        for i in range(int(fps * 1.5)):
-            frame.save(f"resources/frames/{len(store_grid)+1+i+fps*5:04}.png")
-        print(f"\t\u001b[36m ⓘ Generating Video" if verbose else "")
-        generate_video(m, fps=fps)
+    def main_call():
+        fps = 30
+        no_videos = int(input("How Many Videos would you like?: "))
+        for m in range(no_videos):
+            print(f"\u001b[33;1m ⓘ Creating Video #{m+1}/{no_videos} \u001b[0;0m" if verbose else "")
+            print("\u001b[36m ⓘ Creating Files" if verbose else "")
+            create_files()
+            print("\u001b[36m ⓘ Generating Sudoku" if verbose else "")
+            print("\u001b[36m ⓘ Creating Frames" if verbose else "")
+            grid = generate_sudoku()
+            store_grid = SudokuSolver.sudoku(grid)
+            starter_frame = generate_frame(store_grid[0], store_grid[0], len(store_grid))
+            ImPen.impen_text(starter_frame, 250, 200, "Sudoku of the Hour!")
+            ImPen.impen_text(starter_frame, 250, 250, "Can you do it?")
+            for i in range(fps * 5):
+                seconds = i // fps
+                seconds_true = i / fps
+                ImPen.set_col(int(255 * seconds / 5), int(255 * (1 - seconds / 5)), 0)
+                ImPen.impen_text(starter_frame, 300, 300, f"{round(5-seconds_true, 3)}")
+                starter_frame.save(f"resources/frames/{i+1:04}.png")
+                ImPen.set_col(255, 255, 255)
+                ImPen.impen_text(starter_frame, 300, 300, f"{round(5-seconds_true, 3)}")
+
+            for r, i in enumerate(store_grid):
+                print(f"\t\u001b[36m ⓘ Creating Frame: #{r+1}/{len(store_grid)+30}" if verbose else "")
+                if r == 0:
+                    frame = generate_frame(store_grid[r], store_grid[r], len(store_grid))
+                else:
+                    frame = generate_frame(store_grid[r], store_grid[r - 1], len(store_grid))
+                frame.save(f"resources/frames/{r+1+fps*5:04}.png")
+            print(f"\t\u001b[36m ⓘ Creating Frame: #{len(store_grid) + 1}/{len(store_grid) + 1}" if verbose else "")
+            frame = generate_frame(store_grid[len(store_grid)-1], store_grid[len(store_grid)-1], len(store_grid))
+            for i in range(int(fps * 1.5)):
+                frame.save(f"resources/frames/{len(store_grid)+1+i+fps*5:04}.png")
+            print(f"\t\u001b[36m ⓘ Generating Video" if verbose else "")
+            generate_video(m, fps=fps)
+
+    main_call()
 
 
 if __name__ == '__main__':
